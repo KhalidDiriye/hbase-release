@@ -63,8 +63,7 @@ public class TestThriftHttpServer {
   public static final Log LOG =
       LogFactory.getLog(TestThriftHttpServer.class);
 
-  private static final HBaseTestingUtility TEST_UTIL =
-      new HBaseTestingUtility();
+  static final HBaseTestingUtility TEST_UTIL = new HBaseTestingUtility();
 
   private Thread httpServerThread;
   private volatile Exception httpServerException;
@@ -72,7 +71,7 @@ public class TestThriftHttpServer {
   private Exception clientSideException;
 
   private ThriftServer thriftServer;
-  private int port;
+  int port;
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
@@ -133,7 +132,7 @@ public class TestThriftHttpServer {
     runThriftServer(0);
   }
 
-  private void runThriftServer(int customHeaderSize) throws Exception {
+  void runThriftServer(int customHeaderSize) throws Exception {
     List<String> args = new ArrayList<String>();
     port = HBaseTestingUtility.randomFreePort();
     args.add("-" + ThriftServer.PORT_OPTION);
@@ -179,9 +178,9 @@ public class TestThriftHttpServer {
     Assert.assertEquals(HttpURLConnection.HTTP_FORBIDDEN, conn.getResponseCode());
   }
 
-  private static volatile boolean tableCreated = false;
+  static volatile boolean tableCreated = false;
 
-  private void talkToThriftServer(String url, int customHeaderSize) throws Exception {
+  void talkToThriftServer(String url, int customHeaderSize) throws Exception {
     THttpClient httpClient = new THttpClient(url);
     httpClient.open();
 
