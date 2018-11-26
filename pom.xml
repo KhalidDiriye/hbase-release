@@ -39,7 +39,7 @@
   <groupId>org.apache.hbase</groupId>
   <artifactId>hbase</artifactId>
   <packaging>pom</packaging>
-  <version>1.1.2.2.6.3.0-SNAPSHOT</version>
+  <version>1.1.2.2.6.4.106-1</version>
   <name>Apache HBase</name>
   <description>
     Apache HBase&#153; is the Hadoop database. Use it when you need
@@ -1182,7 +1182,7 @@
     <maven.min.version>3.0.3</maven.min.version>
     <java.min.version>${compileSource}</java.min.version>
     <!-- Dependencies -->
-    <hadoop-two.version>2.7.3.2.6.3.0-SNAPSHOT</hadoop-two.version>
+    <hadoop-two.version>2.7.3.2.6.4.106-1</hadoop-two.version>
     <!-- minikdc introduced in hadoop-2.3; override when building earlier versions -->
     <hadoop-two-minikdc.version>${hadoop-two.version}</hadoop-two-minikdc.version>
     <hadoop-three.version>3.0.0-SNAPSHOT</hadoop-three.version>
@@ -1225,7 +1225,7 @@
     <protobuf.version>2.5.0</protobuf.version>
     <thrift.path>thrift</thrift.path>
     <thrift.version>0.9.3</thrift.version>
-    <zookeeper.version>3.4.6.2.6.3.0-SNAPSHOT</zookeeper.version>
+    <zookeeper.version>3.4.6.2.6.4.106-1</zookeeper.version>
     <slf4j.version>1.7.7</slf4j.version>
     <hadoop-snappy.version>0.0.1-SNAPSHOT</hadoop-snappy.version>
     <clover.version>4.0.3</clover.version>
