@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 <!--
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -33,16 +33,16 @@
     <groupId>org.apache</groupId>
     <artifactId>apache</artifactId>
     <version>18</version>
-    <relativePath/>
+    <relativePath />
     <!-- no parent resolution -->
   </parent>
   <groupId>org.apache.hbase</groupId>
   <artifactId>hbase</artifactId>
   <packaging>pom</packaging>
-  <version>2.0.0.3.0.3.0-SNAPSHOT</version>
+  <version>2.0.2.3.1.0.0-78</version>
   <name>Apache HBase</name>
   <description>
-    Apache HBase is the Hadoop database. Use it when you need
+    Apache HBase&#153; is the Hadoop database. Use it when you need
     random, realtime read/write access to your Big Data.
     This project's goal is the hosting of very large tables -- billions of rows X millions of columns -- atop clusters
     of commodity hardware.
@@ -766,7 +766,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore></ignore>
+                    <ignore />
                   </action>
                 </pluginExecution>
                 <pluginExecution>
@@ -1226,9 +1226,9 @@
             <configuration>
               <backend>pdf</backend>
               <attributes>
-                <pagenums/>
-                <toc/>
-                <idprefix/>
+                <pagenums />
+                <toc />
+                <idprefix />
                 <idseparator>-</idseparator>
               </attributes>
             </configuration>
@@ -1355,8 +1355,8 @@
     <maven.min.version>3.0.4</maven.min.version>
     <java.min.version>${compileSource}</java.min.version>
     <!-- Dependencies -->
-    <hadoop-two.version>2.7.7</hadoop-two.version>
-    <hadoop-three.version>3.0.3</hadoop-three.version>
+    <hadoop-two.version>3.1.1.3.1.0.0-78</hadoop-two.version>
+    <hadoop-three.version>3.1.1.3.1.0.0-78</hadoop-three.version>
     <!-- These must be defined here for downstream build tools that don't look at profiles.
          They ought to match the values found in our default hadoop profile, which is
          currently "hadoop-2.0". See HBASE-15925 for more info. -->
@@ -1366,7 +1366,7 @@
     <assembly.file>src/main/assembly/hadoop-two-compat.xml</assembly.file>
     <audience-annotations.version>0.5.0</audience-annotations.version>
     <!-- end HBASE-15925 default hadoop compatibility values -->
-    <spark.version>2.3.0.3.0.0.0-SNAPSHOT</spark.version>
+    <spark.version>2.3.2.3.1.0.0-77</spark.version>
     <scala.version>2.11.8</scala.version>
     <scala.binary.version>2.11</scala.binary.version>
     <avro.version>1.7.7</avro.version>
@@ -1404,7 +1404,7 @@
     <protobuf.plugin.version>0.5.0</protobuf.plugin.version>
     <thrift.path>thrift</thrift.path>
     <thrift.version>0.9.3</thrift.version>
-    <zookeeper.version>3.4.10</zookeeper.version>
+    <zookeeper.version>3.4.6.3.1.0.0-78</zookeeper.version>
     <!-- What ZooKeeper 3.4.x depends on and nothing more -->
     <jline.version>0.9.94</jline.version>
     <slf4j.version>1.7.25</slf4j.version>
@@ -1481,8 +1481,8 @@
     <surefire.secondPartGroups>org.apache.hadoop.hbase.testclassification.MediumTests</surefire.secondPartGroups>
     <surefire.testFailureIgnore>false</surefire.testFailureIgnore>
     <test.output.tofile>true</test.output.tofile>
-    <surefire.timeout>900</surefire.timeout>
-    <test.exclude.pattern></test.exclude.pattern>
+    <surefire.timeout>7200</surefire.timeout>
+    <test.exclude.pattern />
     <!-- default Xmx value is 2800m. Use -Dsurefire.Xmx=xxg to run tests with different JVM Xmx value -->
     <surefire.Xmx>2800m</surefire.Xmx>
     <surefire.cygwinXmx>2800m</surefire.cygwinXmx>
@@ -3002,7 +3002,7 @@
         <surefire.firstPartForkCount>1</surefire.firstPartForkCount>
         <surefire.skipFirstPart>false</surefire.skipFirstPart>
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
-        <surefire.firstPartGroups/>
+        <surefire.firstPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3016,7 +3016,7 @@
         <surefire.skipFirstPart>false</surefire.skipFirstPart>
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
         <surefire.firstPartGroups>org.apache.hadoop.hbase.testclassification.SmallTests</surefire.firstPartGroups>
-        <surefire.secondPartGroups/>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3029,7 +3029,7 @@
         <surefire.skipFirstPart>false</surefire.skipFirstPart>
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
         <surefire.firstPartGroups>org.apache.hadoop.hbase.testclassification.MediumTests</surefire.firstPartGroups>
-        <surefire.secondPartGroups/>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3042,7 +3042,7 @@
         <surefire.skipFirstPart>false</surefire.skipFirstPart>
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
         <surefire.firstPartGroups>org.apache.hadoop.hbase.testclassification.LargeTests</surefire.firstPartGroups>
-        <surefire.secondPartGroups/>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3086,7 +3086,7 @@
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
         <surefire.firstPartGroups>org.apache.hadoop.hbase.testclassification.MiscTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3102,7 +3102,7 @@
         <surefire.firstPartGroups>
           org.apache.hadoop.hbase.testclassification.CoprocessorTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3117,7 +3117,7 @@
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
         <surefire.firstPartGroups>org.apache.hadoop.hbase.testclassification.ClientTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3132,7 +3132,7 @@
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
         <surefire.firstPartGroups>org.apache.hadoop.hbase.testclassification.MasterTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3147,7 +3147,7 @@
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
         <surefire.firstPartGroups>org.apache.hadoop.hbase.testclassification.MapredTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3162,7 +3162,7 @@
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
         <surefire.firstPartGroups>org.apache.hadoop.hbase.testclassification.MapReduceTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3178,7 +3178,7 @@
         <surefire.firstPartGroups>
           org.apache.hadoop.hbase.testclassification.RegionServerTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3194,7 +3194,7 @@
         <surefire.firstPartGroups>
           org.apache.hadoop.hbase.testclassification.VerySlowMapReduceTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
 
@@ -3211,7 +3211,7 @@
         <surefire.firstPartGroups>
           org.apache.hadoop.hbase.testclassification.VerySlowRegionServerTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
 
@@ -3227,7 +3227,7 @@
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
         <surefire.firstPartGroups>org.apache.hadoop.hbase.testclassification.FilterTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3242,7 +3242,7 @@
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
         <surefire.firstPartGroups>org.apache.hadoop.hbase.testclassification.IOTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3257,7 +3257,7 @@
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
         <surefire.firstPartGroups>org.apache.hadoop.hbase.testclassification.RestTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3272,7 +3272,7 @@
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
         <surefire.firstPartGroups>org.apache.hadoop.hbase.testclassification.RPCTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3288,7 +3288,7 @@
         <surefire.firstPartGroups>
           org.apache.hadoop.hbase.testclassification.ReplicationTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3303,7 +3303,7 @@
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
         <surefire.firstPartGroups>org.apache.hadoop.hbase.testclassification.SecurityTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3318,7 +3318,7 @@
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
         <surefire.firstPartGroups>org.apache.hadoop.hbase.testclassification.FlakeyTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
     <profile>
@@ -3333,7 +3333,7 @@
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
         <surefire.firstPartGroups>org.apache.hadoop.hbase.testclassification.ZKTests
         </surefire.firstPartGroups>
-        <surefire.secondPartGroups></surefire.secondPartGroups>
+        <surefire.secondPartGroups />
       </properties>
     </profile>
 
@@ -3349,7 +3349,7 @@
         <surefire.provider>surefire-junit4</surefire.provider>
         <surefire.skipFirstPart>false</surefire.skipFirstPart>
         <surefire.skipSecondPart>true</surefire.skipSecondPart>
-        <surefire.firstPartGroups/>
+        <surefire.firstPartGroups />
       </properties>
     </profile>
     <!-- Profile for running clover. You need to have a clover license under ~/.clover.license for ${clover.version}
