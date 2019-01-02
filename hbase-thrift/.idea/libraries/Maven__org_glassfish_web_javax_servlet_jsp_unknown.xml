@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.glassfish.web:javax.servlet.jsp:unknown">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/web/javax.servlet.jsp/unknown/javax.servlet.jsp-unknown.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/web/javax.servlet.jsp/unknown/javax.servlet.jsp-unknown-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/web/javax.servlet.jsp/unknown/javax.servlet.jsp-unknown-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

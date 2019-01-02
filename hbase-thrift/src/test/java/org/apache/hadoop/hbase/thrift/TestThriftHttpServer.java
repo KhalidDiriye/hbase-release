@@ -56,8 +56,7 @@ public class TestThriftHttpServer {
   public static final Log LOG =
       LogFactory.getLog(TestThriftHttpServer.class);
 
-  private static final HBaseTestingUtility TEST_UTIL =
-      new HBaseTestingUtility();
+  static final HBaseTestingUtility TEST_UTIL = new HBaseTestingUtility();
 
   private Thread httpServerThread;
   private volatile Exception httpServerException;
@@ -65,7 +64,7 @@ public class TestThriftHttpServer {
   private Exception clientSideException;
 
   private ThriftServer thriftServer;
-  private int port;
+  int port;
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
@@ -126,16 +125,18 @@ public class TestThriftHttpServer {
     runThriftServer(0);
   }
 
-  private void runThriftServer(int customHeaderSize) throws Exception {
+  void runThriftServer(int customHeaderSize) throws Exception {
     List<String> args = new ArrayList<String>();
     port = HBaseTestingUtility.randomFreePort();
     args.add("-" + ThriftServer.PORT_OPTION);
     args.add(String.valueOf(port));
+    args.add("-" + ThriftServer.INFOPORT_OPTION);
+    int infoPort = HBaseTestingUtility.randomFreePort();
+    args.add(String.valueOf(infoPort));
     args.add("start");
 
     thriftServer = new ThriftServer(TEST_UTIL.getConfiguration());
     startHttpServerThread(args.toArray(new String[args.size()]));
-
     // wait up to 10s for the server to start
     for (int i = 0; i < 100
         && ( thriftServer.serverRunner == null ||  thriftServer.serverRunner.httpServer ==
@@ -144,7 +145,7 @@ public class TestThriftHttpServer {
     }
 
     try {
-      talkToThriftServer(customHeaderSize);
+      talkToThriftServer(null, customHeaderSize);
     } catch (Exception ex) {
       clientSideException = ex;
     } finally {
@@ -161,9 +162,9 @@ public class TestThriftHttpServer {
     }
   }
 
-  private static volatile boolean tableCreated = false;
+  static volatile boolean tableCreated = false;
 
-  private void talkToThriftServer(int customHeaderSize) throws Exception {
+  void talkToThriftServer(String url, int customHeaderSize) throws Exception {
     THttpClient httpClient = new THttpClient(
         "http://"+ HConstants.LOCALHOST + ":" + port);
     httpClient.open();

@@ -1807,6 +1807,10 @@
        <artifactId>kerb-simplekdc</artifactId>
        <version>${kerby.version}</version>
      </dependency>
+     <dependency>
+       <groupId>org.glassfish</groupId>
+       <artifactId>javax.el</artifactId>
+     </dependency>
     </dependencies>
   </dependencyManagement>
   <!-- Dependencies needed by subprojects -->

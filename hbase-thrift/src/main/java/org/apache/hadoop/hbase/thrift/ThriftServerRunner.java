@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -142,6 +142,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 public class ThriftServerRunner implements Runnable {
 
   private static final Log LOG = LogFactory.getLog(ThriftServerRunner.class);
+  
 
   static final String SERVER_TYPE_CONF_KEY =
       "hbase.regionserver.thrift.server.type";
@@ -153,14 +154,23 @@ public class ThriftServerRunner implements Runnable {
   static final String PORT_CONF_KEY = "hbase.regionserver.thrift.port";
   static final String COALESCE_INC_KEY = "hbase.regionserver.thrift.coalesceIncrement";
   static final String USE_HTTP_CONF_KEY = "hbase.regionserver.thrift.http";
-  static final String HTTP_MIN_THREADS = "hbase.thrift.http_threads.min";
-  static final String HTTP_MAX_THREADS = "hbase.thrift.http_threads.max";
+  static final String HTTP_MIN_THREADS_KEY = "hbase.thrift.http_threads.min";
+  static final String HTTP_MAX_THREADS_KEY = "hbase.thrift.http_threads.max";
 
-  static final String THRIFT_SSL_ENABLED = "hbase.thrift.ssl.enabled";
-  static final String THRIFT_SSL_KEYSTORE_STORE = "hbase.thrift.ssl.keystore.store";
-  static final String THRIFT_SSL_KEYSTORE_PASSWORD = "hbase.thrift.ssl.keystore.password";
-  static final String THRIFT_SSL_KEYSTORE_KEYPASSWORD = "hbase.thrift.ssl.keystore.keypassword";
-
+  static final String THRIFT_SSL_ENABLED_KEY = "hbase.thrift.ssl.enabled";
+  static final String THRIFT_SSL_KEYSTORE_STORE_KEY = "hbase.thrift.ssl.keystore.store";
+  static final String THRIFT_SSL_KEYSTORE_PASSWORD_KEY = "hbase.thrift.ssl.keystore.password";
+  static final String THRIFT_SSL_KEYSTORE_KEYPASSWORD_KEY = "hbase.thrift.ssl.keystore.keypassword";  static final String THRIFT_SSL_EXCLUDE_CIPHER_SUITES_KEY = "hbase.thrift.ssl.exclude.cipher.suites";
+  static final String THRIFT_SSL_INCLUDE_CIPHER_SUITES_KEY = "hbase.thrift.ssl.include.cipher.suites";
+  static final String THRIFT_SSL_EXCLUDE_PROTOCOLS_KEY = "hbase.thrift.ssl.exclude.protocols";
+  static final String THRIFT_SSL_INCLUDE_PROTOCOLS_KEY = "hbase.thrift.ssl.include.protocols";
+  static final String THRIFT_SUPPORT_PROXYUSER_KEY = "hbase.thrift.support.proxyuser";
+  static final String THRIFT_DNS_INTERFACE_KEY = "hbase.thrift.dns.interface";
+  static final String THRIFT_DNS_NAMESERVER_KEY = "hbase.thrift.dns.nameserver";
+  static final String THRIFT_KERBEROS_PRINCIPAL_KEY = "hbase.thrift.kerberos.principal";
+  static final String THRIFT_KEYTAB_FILE_KEY = "hbase.thrift.keytab.file";
+  static final String THRIFT_SPNEGO_PRINCIPAL_KEY = "hbase.thrift.spnego.principal";
+  static final String THRIFT_SPNEGO_KEYTAB_FILE_KEY = "hbase.thrift.spnego.keytab.file";
 
   /**
    * Thrift quality of protection configuration key. Valid values can be:
@@ -176,7 +186,7 @@ public class ThriftServerRunner implements Runnable {
   private static final String DEFAULT_BIND_ADDR = "0.0.0.0";
   public static final int DEFAULT_LISTEN_PORT = 9090;
   public static final int HREGION_VERSION = 1;
-  static final String THRIFT_SUPPORT_PROXYUSER = "hbase.thrift.support.proxyuser";
+
   private final int listenPort;
 
   private Configuration conf;
@@ -185,7 +195,7 @@ public class ThriftServerRunner implements Runnable {
   private final Hbase.Iface handler;
   private final ThriftMetrics metrics;
   private final HBaseHandler hbaseHandler;
-  private final UserGroupInformation realUser;
+  private final UserGroupInformation serviceUGI;
 
   private final String qop;
   private String host;
@@ -198,8 +208,7 @@ public class ThriftServerRunner implements Runnable {
     HS_HA("hsha", true, THsHaServer.class, true),
     NONBLOCKING("nonblocking", true, TNonblockingServer.class, true),
     THREAD_POOL("threadpool", false, TBoundedThreadPoolServer.class, true),
-    THREADED_SELECTOR(
-        "threadedselector", true, TThreadedSelectorServer.class, true);
+    THREADED_SELECTOR("threadedselector", true, TThreadedSelectorServer.class, true);
 
     public static final ImplType DEFAULT = THREAD_POOL;
 
@@ -217,8 +226,7 @@ public class ThriftServerRunner implements Runnable {
     }
 
     /**
-     * @return <code>-option</code> so we can get the list of options from
-     *         {@link #values()}
+     * @return <code>-option</code>
      */
     @Override
     public String toString() {
@@ -298,21 +306,28 @@ public class ThriftServerRunner implements Runnable {
       && userProvider.isHBaseSecurityEnabled();
     if (securityEnabled) {
       host = Strings.domainNamePointerToHostName(DNS.getDefaultHost(
-        conf.get("hbase.thrift.dns.interface", "default"),
-        conf.get("hbase.thrift.dns.nameserver", "default")));
-      userProvider.login("hbase.thrift.keytab.file",
-        "hbase.thrift.kerberos.principal", host);
+    		  conf.get(THRIFT_DNS_INTERFACE_KEY, "default"),
+    		  conf.get(THRIFT_DNS_NAMESERVER_KEY, "default")));
+      userProvider.login(THRIFT_KEYTAB_FILE_KEY, THRIFT_KERBEROS_PRINCIPAL_KEY, host);
     }
+    this.serviceUGI = userProvider.getCurrent().getUGI();
+    
     this.conf = HBaseConfiguration.create(conf);
     this.listenPort = conf.getInt(PORT_CONF_KEY, DEFAULT_LISTEN_PORT);
     this.metrics = new ThriftMetrics(conf, ThriftMetrics.ThriftServerType.ONE);
     this.hbaseHandler = new HBaseHandler(conf, userProvider);
     this.hbaseHandler.initMetrics(metrics);
-    this.handler = HbaseHandlerMetricsProxy.newInstance(
-      hbaseHandler, metrics, conf);
-    this.realUser = userProvider.getCurrent().getUGI();
+    
+    this.handler = HbaseHandlerMetricsProxy.newInstance(hbaseHandler, metrics, conf);
+    
+    boolean httpEnabled = conf.getBoolean(USE_HTTP_CONF_KEY, false);
+    doAsEnabled = conf.getBoolean(THRIFT_SUPPORT_PROXYUSER_KEY, false);
+    if (doAsEnabled && !httpEnabled) {
+    	LOG.warn("Fail to enable the doAs feature. " + USE_HTTP_CONF_KEY + " is not configured");
+    }
+    
     qop = conf.get(THRIFT_QOP_KEY);
-    doAsEnabled = conf.getBoolean(THRIFT_SUPPORT_PROXYUSER, false);
+    
     if (qop != null) {
       if (!qop.equals("auth") && !qop.equals("auth-int")
           && !qop.equals("auth-conf")) {
@@ -320,8 +335,7 @@ public class ThriftServerRunner implements Runnable {
           + ", it must be 'auth', 'auth-int', or 'auth-conf'");
       }
       if (!securityEnabled) {
-        throw new IOException("Thrift server must"
-          + " run in secure mode to support authentication");
+    	  throw new IOException("Thrift server must run in secure mode to support authentication");
       }
     }
   }
@@ -331,7 +345,7 @@ public class ThriftServerRunner implements Runnable {
    */
   @Override
   public void run() {
-    realUser.doAs(new PrivilegedAction<Object>() {
+    serviceUGI.doAs(new PrivilegedAction<Object>() {
       @Override
       public Object run() {
         try {
@@ -364,7 +378,7 @@ public class ThriftServerRunner implements Runnable {
         httpServer.stop();
         httpServer = null;
       } catch (Exception e) {
-        LOG.error("Problem encountered in shutting down HTTP server " + e.getCause());
+        LOG.error("Problem encountered in shutting down HTTP server", e);
       }
       httpServer = null;
     }
@@ -373,7 +387,7 @@ public class ThriftServerRunner implements Runnable {
   private void setupHTTPServer() throws IOException {
     TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
     TProcessor processor = new Hbase.Processor<Hbase.Iface>(handler);
-    TServlet thriftHttpServlet = new ThriftHttpServlet(processor, protocolFactory, realUser,
+    TServlet thriftHttpServlet = new ThriftHttpServlet(processor, protocolFactory, serviceUGI,
         conf, hbaseHandler, securityEnabled, doAsEnabled);
 
     httpServer = new Server();
@@ -386,19 +400,19 @@ public class ThriftServerRunner implements Runnable {
 
     // set up Jetty and run the embedded server
     Connector connector = new SelectChannelConnector();
-    if(conf.getBoolean(THRIFT_SSL_ENABLED, false)) {
+    if(conf.getBoolean(THRIFT_SSL_ENABLED_KEY, false)) {
       SslSelectChannelConnector sslConnector = new SslSelectChannelConnector();
-      String keystore = conf.get(THRIFT_SSL_KEYSTORE_STORE);
+      String keystore = conf.get(THRIFT_SSL_KEYSTORE_STORE_KEY);
       String password = HBaseConfiguration.getPassword(conf,
-          THRIFT_SSL_KEYSTORE_PASSWORD, null);
+          THRIFT_SSL_KEYSTORE_PASSWORD_KEY, null);
       String keyPassword = HBaseConfiguration.getPassword(conf,
-          THRIFT_SSL_KEYSTORE_KEYPASSWORD, password);
+          THRIFT_SSL_KEYSTORE_KEYPASSWORD_KEY, password);
       sslConnector.setKeystore(keystore);
       sslConnector.setPassword(password);
       sslConnector.setKeyPassword(keyPassword);
       connector = sslConnector;
     }
-    String host = getBindAddress(conf).getHostAddress();
+    connector.setHost(getBindAddress(conf).getHostAddress());
     connector.setPort(listenPort);
     connector.setHost(host);
     connector.setHeaderBufferSize(1024 * 64);
@@ -413,8 +427,8 @@ public class ThriftServerRunner implements Runnable {
     // Jetty set the default max thread number to 250, if we don't set it.
     //
     // Our default min thread number 2 is the same as that used by Jetty.
-    int minThreads = conf.getInt(HTTP_MIN_THREADS, 2);
-    int maxThreads = conf.getInt(HTTP_MAX_THREADS, 100);
+    int minThreads = conf.getInt(HTTP_MIN_THREADS_KEY, 2);
+    int maxThreads = conf.getInt(HTTP_MAX_THREADS_KEY, 100);
     QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads);
     threadPool.setMinThreads(minThreads);
     httpServer.setThreadPool(threadPool);
@@ -458,8 +472,11 @@ public class ThriftServerRunner implements Runnable {
       transportFactory = new TTransportFactory();
     } else {
       // Extract the name from the principal
-      String name = SecurityUtil.getUserFromPrincipal(
-        conf.get("hbase.thrift.kerberos.principal"));
+      String thriftKerberosPrincipal = conf.get(THRIFT_KERBEROS_PRINCIPAL_KEY);
+      if (thriftKerberosPrincipal == null) {
+    	  throw new IllegalArgumentException(THRIFT_KERBEROS_PRINCIPAL_KEY + " cannot be null");
+      }
+      String name = SecurityUtil.getUserFromPrincipal(thriftKerberosPrincipal);
       Map<String, String> saslProperties = new HashMap<String, String>();
       saslProperties.put(Sasl.QOP, qop);
       TSaslServerTransport.Factory saslFactory = new TSaslServerTransport.Factory();
@@ -636,11 +653,11 @@ public class ThriftServerRunner implements Runnable {
 
     // nextScannerId and scannerMap are used to manage scanner state
     protected int nextScannerId = 0;
-    protected HashMap<Integer, ResultScannerWrapper> scannerMap = null;
+    protected HashMap<Integer, ResultScannerWrapper> scannerMap;
     private ThriftMetrics metrics = null;
 
     private final ConnectionCache connectionCache;
-    IncrementCoalescer coalescer = null;
+    IncrementCoalescer coalescer;
 
     static final String CLEANUP_INTERVAL = "hbase.thrift.connection.cleanup-interval";
     static final String MAX_IDLETIME = "hbase.thrift.connection.max-idletime";
@@ -1224,8 +1241,7 @@ public class ThriftServerRunner implements Runnable {
     public void mutateRow(ByteBuffer tableName, ByteBuffer row,
         List<Mutation> mutations, Map<ByteBuffer, ByteBuffer> attributes)
         throws IOError, IllegalArgument {
-      mutateRowTs(tableName, row, mutations, HConstants.LATEST_TIMESTAMP,
-                  attributes);
+      mutateRowTs(tableName, row, mutations, HConstants.LATEST_TIMESTAMP, attributes);
     }
 
     @Override
@@ -1389,8 +1405,7 @@ public class ThriftServerRunner implements Runnable {
       LOG.debug("scannerClose: id=" + id);
       ResultScannerWrapper resultScannerWrapper = getScanner(id);
       if (resultScannerWrapper == null) {
-        String message = "scanner ID is invalid";
-        LOG.warn(message);
+        LOG.warn("scanner ID is invalid");
         throw new IllegalArgument("scanner ID is invalid");
       }
       resultScannerWrapper.getScanner().close();
@@ -1408,7 +1423,7 @@ public class ThriftServerRunner implements Runnable {
         throw new IllegalArgument("scanner ID is invalid");
       }
 
-      Result [] results = null;
+      Result [] results;
       try {
         results = resultScannerWrapper.getScanner().next(nbRows);
         if (null == results) {
