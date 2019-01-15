@@ -161,8 +161,9 @@ public class ThriftServer {
         conf.setInt(ThriftServerRunner.PORT_CONF_KEY, listenPort);
       }
     } catch (NumberFormatException e) {
-      LOG.error("Could not parse the value provided for the port option", e);
-      printUsageAndExit(options, -1);
+    	LOG.error("Could not parse the value provided for the " + INFOPORT_OPTION +      
+    		" option", e);
+    	printUsageAndExit(options, -1);
     }
 
     // check for user-defined info server port setting, if so override the conf

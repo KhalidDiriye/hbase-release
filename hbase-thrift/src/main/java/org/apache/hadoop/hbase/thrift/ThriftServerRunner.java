@@ -526,12 +526,10 @@ public class ThriftServerRunner implements Runnable {
     }
 
     if (conf.get(BIND_CONF_KEY) != null && !implType.canSpecifyBindIP) {
-      LOG.error("Server types " + Joiner.on(", ").join(
-          ImplType.serversThatCannotSpecifyBindIP()) + " don't support IP " +
-          "address binding at the moment. See " +
-          "https://issues.apache.org/jira/browse/HBASE-2155 for details.");
-      throw new RuntimeException(
-          "-" + BIND_CONF_KEY + " not supported with " + implType);
+    	LOG.error("Server types {} don't support IP address binding at the moment. See " +
+    			"https://issues.apache.org/jira/browse/HBASE-2155 for details." +
+    			Joiner.on(", ").join(ImplType.serversThatCannotSpecifyBindIP()));
+    	throw new RuntimeException("-" + BIND_CONF_KEY + " not supported with " + implType);
     }
 
     if (implType == ImplType.HS_HA || implType == ImplType.NONBLOCKING ||
@@ -816,8 +814,8 @@ public class ThriftServerRunner implements Runnable {
       try {
         TableName[] tableNames = this.getAdmin().listTableNames();
         ArrayList<ByteBuffer> list = new ArrayList<ByteBuffer>(tableNames.length);
-        for (int i = 0; i < tableNames.length; i++) {
-          list.add(ByteBuffer.wrap(tableNames[i].getName()));
+        for (TableName tableName : tableNames) {
+        	list.add(ByteBuffer.wrap(tableName.getName()));
         }
         return list;
       } catch (IOException e) {
@@ -830,8 +828,7 @@ public class ThriftServerRunner implements Runnable {
      * @return the list of regions in the given table, or an empty list if the table does not exist
      */
     @Override
-    public List<TRegionInfo> getTableRegions(ByteBuffer tableName)
-    throws IOError {
+    public List<TRegionInfo> getTableRegions(ByteBuffer tableName) throws IOError {
       try (RegionLocator locator = connectionCache.getRegionLocator(getBytes(tableName))) {
         List<HRegionLocation> regionLocations = locator.getAllRegionLocations();
         List<TRegionInfo> results = new ArrayList<TRegionInfo>();
@@ -1270,8 +1267,7 @@ public class ThriftServerRunner implements Runnable {
             } else {
               delete.deleteColumns(famAndQf[0], famAndQf[1], timestamp);
             }
-            delete.setDurability(m.writeToWAL ? Durability.SYNC_WAL
-                : Durability.SKIP_WAL);
+            delete.setDurability(m.writeToWAL ? Durability.SYNC_WAL : Durability.SKIP_WAL);
           } else {
             if(famAndQf.length == 1) {
               LOG.warn("No column qualifier specified. Delete is the only mutation supported "
@@ -1466,7 +1462,7 @@ public class ThriftServerRunner implements Runnable {
         if (tScan.isSetBatchSize()) {
           scan.setBatch(tScan.getBatchSize());
         }
-        if (tScan.isSetColumns() && tScan.getColumns().size() != 0) {
+        if (tScan.isSetColumns() && !tScan.getColumns().isEmpty()) {
           for(ByteBuffer column : tScan.getColumns()) {
             byte [][] famQf = KeyValue.parseColumn(getBytes(column));
             if(famQf.length == 1) {
@@ -1503,7 +1499,7 @@ public class ThriftServerRunner implements Runnable {
         table = getTable(tableName);
         Scan scan = new Scan(getBytes(startRow));
         addAttributes(scan, attributes);
-        if(columns != null && columns.size() != 0) {
+        if(columns != null && !columns.isEmpty()) {
           for(ByteBuffer column : columns) {
             byte [][] famQf = KeyValue.parseColumn(getBytes(column));
             if(famQf.length == 1) {
@@ -1533,7 +1529,7 @@ public class ThriftServerRunner implements Runnable {
         table = getTable(tableName);
         Scan scan = new Scan(getBytes(startRow), getBytes(stopRow));
         addAttributes(scan, attributes);
-        if(columns != null && columns.size() != 0) {
+        if(columns != null && !columns.isEmpty()) {
           for(ByteBuffer column : columns) {
             byte [][] famQf = KeyValue.parseColumn(getBytes(column));
             if(famQf.length == 1) {
@@ -1742,13 +1738,9 @@ public class ThriftServerRunner implements Runnable {
       scan.setReversed(true);
       scan.addFamily(family);
       scan.setStartRow(row);
-      Table table = getTable(tableName);      
-      try (ResultScanner scanner = table.getScanner(scan)) {
+      try (Table table = getTable(tableName);
+    		  ResultScanner scanner = table.getScanner(scan)) {
         return scanner.next();
-      } finally{
-        if(table != null){
-          table.close();
-        }
       }
     }
 

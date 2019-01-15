@@ -213,13 +213,6 @@
 
   <dependencies>
     <!-- Intra-project dependencies -->
-	<dependency>
-	    <groupId>jdk.tools</groupId>
-	    <artifactId>jdk.tools</artifactId>
-	    <version>1.7.0_80</version>
-	    <scope>system</scope>
-	    <systemPath>${JAVA_HOME}/lib/tools.jar</systemPath>
-	</dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase-common</artifactId>
